@@ -19,7 +19,6 @@ bool runOnBasicBlock(BasicBlock &B) {
   for(BasicBlock::iterator BBIterator = B.begin(); BBIterator != B.end(); ++BBIterator){
     // Ad ogni iterazione aggiorno l'istruzione corrente.
     currentInstruction = &(*BBIterator);
-    currentInstruction->print(outs());
     Value *operando0 = currentInstruction->getOperand(0);
     ConstantInt *CI0 = dyn_cast<ConstantInt>(operando0);
     Value *operando1 = currentInstruction->getOperand(1);
@@ -28,16 +27,6 @@ bool runOnBasicBlock(BasicBlock &B) {
     // controllo che l'istruzione sia una Mul
     if(currentInstruction->getOpcode() == Instruction::Mul){
 
-/*
-      outs()<< currentInstruction << " : operando 0: ";
-      operando0->printAsOperand(outs(),false);
-      outs()<<" , ";
-      operando1->printAsOperand(outs(),false);
-      outs()<<"\n";
-*/
-      // Controllo se uno dei due operandi sia 1
-
-      // || () ){
       if( CI0 and CI0->getValue().isOne()){
         LocalOpts::algebraicIdentity(operando1);
       }
@@ -157,10 +146,10 @@ void LocalOpts::advancedMulwShift(ConstantInt* costanteMoltiplicativa, Value* re
                                                        offset));
 
   offsetCorretto->insertAfter(ShiftArrotondato);
-  // Concettualmente era corretto. Pero devo sempre andare ad aggiungere direi!
-  // L'offset è già una quantità positiva o negativa quindi aggiungo o sottraggo di conseguenza.
+  // Concettualmente era corretto. Pero posso anche sempre aggiungere...
+  // L'offset è già una quantità positiva o negativa quindi aggiungo questa quantità.
   // Se l'offset fosse stato unsigned allora avrei dovuto differenziare i due casi.
-  // Questo forse è meno carino perché andando a leggere la IR sembra che aggiungo sempre ma in realtà potrei aggiugnere una quantità negativa però il codice è più semplice
+  // Questo sarà anche meno carino perché andando a leggere la IR sembra che aggiungo sempre ma magari sto aggiungendo una quantità negativa. Codice meno chiaro ma più compatto.
   /*
   if(offset.isStriclyPositive()){
     // Vuol dire che devo aggiungere. Lo shift arrotondato era per difetto
@@ -209,7 +198,6 @@ void LocalOpts::advancedDivwShift(ConstantInt* costanteDivisoria, Value* registr
 }
 
 void LocalOpts::algebraicIdentity(Value* valueNotIdentity){
-//   currentInstruction->print(outs());
   currentInstruction->replaceAllUsesWith(valueNotIdentity);
 }
 
